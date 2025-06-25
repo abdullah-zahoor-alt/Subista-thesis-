@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dear Teacher</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 🔘 Buttons -->
+  <!-- Top-Left: Go to City -->
+<a href="city.html" target="_blank" class="circle-btn" style="top: 10px; left: 10px;" title="City View"></a>
+
+<!-- Top-Right: Download Notes -->
+<button id="downloadBtn" class="circle-btn" style="top: 10px; right: 10px;" title="Download Notes"></button>
+
+
+  <div class="page">
+    <div class="left-wall">
+      <div class="input-container">
+        <p class="prompt">Dear Teacher,</p>
+        <div id="userInput" contenteditable="true" class="input-box"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="note-popup" id="notePopup">
+    <div class="note-box">
+      <span id="noteText"></span>
+    </div>
+  </div>
+
+  <script>
+    const channel = new BroadcastChannel('dear-teacher');
+    const userInput = document.getElementById('userInput');
+    const downloadBtn = document.getElementById('downloadBtn');
+    const cityBtn = document.getElementById('cityBtn');
+
+    const savedNotes = [];
+
+    userInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        const message = userInput.innerText.trim();
+        if (message) {
+          const finalNote = `Dear Teacher,\n${message}`;
+          channel.postMessage(finalNote);
+          savedNotes.push(finalNote);
+          userInput.innerText = '';
+        }
+      }
+    });
+
+    downloadBtn.addEventListener('click', () => {
+      if (savedNotes.length === 0) {
+        alert("No notes to save yet!");
+        return;
+      }
+
+      const blob = new Blob([savedNotes.join('\n\n')], { type: 'text/plain' });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'teacher_notes.txt';
+      a.click();
+
+      URL.revokeObjectURL(url);
+    });
+
+    cityBtn.addEventListener('click', () => {
+      window.open('city.html', '_blank');
+    });
+  </script>
+
+</body>
+</html>
